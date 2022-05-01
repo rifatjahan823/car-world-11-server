@@ -18,13 +18,18 @@ async function run() {
     try {
       await client.connect();
       const inventoryCollection = client.db("carWorld").collection("inventory");
-      // create a document to insert
-     app.post('/user',(req,res)=>{
- 
-   })
-      const result = await userCollection.insertOne(user);
-    } finally {
-      await client.close();
+
+        //get all inventory
+        app.get("/inventory",async(req,res)=>{
+         const query = {};
+         const cursor = inventoryCollection.find(query);
+         const inventories = await cursor.toArray();
+         res.send(inventories);
+  })
+
+    } 
+    finally {
+    
     }
   }
   run().catch(console.dir);
