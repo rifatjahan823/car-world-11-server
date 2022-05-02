@@ -36,7 +36,7 @@ async function run() {
 
       //update quantity
 
-   app.put('/inventory/:Id',async(req,res)=>{
+   app.put('/inventorie/:Id',async(req,res)=>{
     const Id = req.params.Id;
     const updateUser= req.body;
     const filter = {_id:ObjectId(Id)};
@@ -51,8 +51,38 @@ async function run() {
     res.send(result)
   })
 
+      //update deliver
 
+   app.put('/inventory/:Id',async(req,res)=>{
+    const Id = req.params.Id;
+    const updateUser= req.body;
+    const filter = {_id:ObjectId(Id)};
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        quantity:updateUser.quantity-1,
+       
+      },
+    };
+    const result = await inventoryCollection.updateOne(filter, updateDoc, options);
+    res.send(result)
+  })
 
+ //post and add new inventory
+
+ app.post("/inventory",async(req,res)=>{
+  const newService = req.body;
+  const result = await inventoryCollection.insertOne(newService);
+  res.send(result)
+})
+
+   //delete
+   app.delete("/inventory/:Id",async(req,res)=>{
+    const Id = req.params.Id
+    const query = {_id:ObjectId(Id)};
+    const result = await inventoryCollection.deleteOne(query);
+    res.send(result)
+})
   
     } 
     finally {
