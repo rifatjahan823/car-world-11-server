@@ -43,24 +43,7 @@ async function run() {
     const options = { upsert: true };
     const updateDoc = {
       $set: {
-        quantity:updateUser.quantity,
-       
-      },
-    };
-    const result = await inventoryCollection.updateOne(filter, updateDoc, options);
-    res.send(result)
-  })
-
-      //update deliver
-
-   app.put('/inventory/:Id',async(req,res)=>{
-    const Id = req.params.Id;
-    const updateUser= req.body;
-    const filter = {_id:ObjectId(Id)};
-    const options = { upsert: true };
-    const updateDoc = {
-      $set: {
-        quantity:updateUser.quantity-1,
+       ...updateUser
        
       },
     };
@@ -69,13 +52,29 @@ async function run() {
   })
 
  //post and add new inventory
-
  app.post("/inventory",async(req,res)=>{
   const newService = req.body;
   const result = await inventoryCollection.insertOne(newService);
   res.send(result)
 })
+//
+app.post("/inventorys",async(req,res)=>{
+  const decodeEmail = req.decoded.email;
+  const email= req.query.email;
+  if(email===decodeEmail){
+    const data = await myinventory.find({email:email}).sort({name:"asd"})
+  }
 
+  res.send({result:data})
+})
+//get my inventory
+app.get("/inventorys",async(req,res)=>{
+  const email = req.query.email;
+  const query = {email:email};
+  const cursor = inventoryCollection.find(query);
+  const inventory = await cursor.toArray();
+  res.send(inventory)
+})
    //delete
    app.delete("/inventory/:Id",async(req,res)=>{
     const Id = req.params.Id
@@ -83,7 +82,8 @@ async function run() {
     const result = await inventoryCollection.deleteOne(query);
     res.send(result)
 })
-  
+
+ 
     } 
     finally {
     
