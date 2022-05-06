@@ -2,7 +2,9 @@ const express = require('express');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
-var cors = require('cors');
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const { request } = require('express');
 const port = process.env.PORT || 5000
 //use middleware
 app.use(cors());
@@ -16,6 +18,14 @@ async function run() {
     try {
       await client.connect();
       const inventoryCollection = client.db("carWorld").collection("inventory");
+
+        //Auth
+        app.post("/login",async(req,res)=>{
+          const email = req.body;
+          const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+          res.send({ accessToken })
+
+        })
 
         //get all inventory
         app.get("/inventory",async(req,res)=>{
@@ -59,16 +69,14 @@ async function run() {
 })
 //
 app.post("/inventorys",async(req,res)=>{
-  const decodeEmail = req.decoded.email;
-  const email= req.query.email;
-  if(email===decodeEmail){
-    const data = await myinventory.find({email:email}).sort({name:"asd"})
-  }
-
-  res.send({result:data})
+  const addOrder = req.body;
+  const result = await inventoryCollection.insertOne(addOrder);
+  res.send(result)
 })
 //get my inventory
 app.get("/inventorys",async(req,res)=>{
+  const authHeader = req.headers.authorization;
+  console.log(authHeader)
   const email = req.query.email;
   const query = {email:email};
   const cursor = inventoryCollection.find(query);
@@ -90,9 +98,6 @@ app.get("/inventorys",async(req,res)=>{
     }
   }
   run().catch(console.dir);
- 
-
-
 
 
 app.get('/', (req, res) => {
