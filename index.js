@@ -72,9 +72,7 @@ async function run() {
     const options = { upsert: true };
     const updateDoc = {
       $set: {
-      //  ...updateUser
-      quantity:req.quantity,
-      sold:req.sold
+       ...updateUser
        
       },
     };
