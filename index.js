@@ -27,6 +27,25 @@ async function run() {
 
         })
 
+
+        // verifytoken for user
+
+        function verifyToken(req,res,next){
+          const tokenVerify = req.headers.authorization;
+          if (!tokenVerify ) {
+              return res.status(401).send({ message: 'unauthorized access' });
+          }
+          const token = tokenVerify.split(' ')[1];
+          jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+              if (err) {
+                  return res.status(403).send({ message: 'Forbidden access' });
+              }
+              console.log('decoded', decoded);
+              req.decoded = decoded;
+              next();
+          })
+        }
+
         //get all inventory
         app.get("/inventory",async(req,res)=>{
          const query = {};
@@ -63,9 +82,9 @@ async function run() {
 
  //post and add new inventory
  app.post("/inventory",async(req,res)=>{
-  const newService = req.body;
-  const result = await inventoryCollection.insertOne(newService);
-  res.send(result)
+  const inventory = req.body;
+  const getInventory = await inventoryCollection.insertOne(inventory);
+  res.send(getInventory)
 })
 //
 app.post("/inventorys",async(req,res)=>{
@@ -74,14 +93,17 @@ app.post("/inventorys",async(req,res)=>{
   res.send(result)
 })
 //get my inventory
-app.get("/inventorys",async(req,res)=>{
-  const authHeader = req.headers.authorization;
-  console.log(authHeader)
+app.get("/inventorys",verifyToken,async(req,res)=>{
+  const decodedEmail = req.decoded.email;
   const email = req.query.email;
+  if (email === decodedEmail) {
   const query = {email:email};
   const cursor = inventoryCollection.find(query);
   const inventory = await cursor.toArray();
   res.send(inventory)
+}else{
+  res.status(403).send({message: 'forbidden access'})
+}
 })
    //delete
    app.delete("/inventory/:Id",async(req,res)=>{
