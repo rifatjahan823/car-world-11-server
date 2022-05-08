@@ -21,7 +21,9 @@ async function run() {
         //Auth
         app.post("/login",async(req,res)=>{
           const email = req.body;
-          const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+          const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET,{
+            expiresIn:'1d'
+          });
           res.send({ accessToken })
 
         })
