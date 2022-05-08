@@ -84,6 +84,8 @@ async function run() {
    app.put('/restock/:Id',async(req,res)=>{
     const Id = req.params.Id;
     const updateUser= req.body.quantitys;
+    const getQuantity= req.body.getQuantity;
+    const sumQuantity = 
     const filter = {_id:ObjectId(Id)};
     const options = { upsert: true };
     const updateDoc = {
