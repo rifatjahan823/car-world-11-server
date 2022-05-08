@@ -64,7 +64,7 @@ async function run() {
 
    //update quantity
 
-   app.put('/inventorie/:Id',async(req,res)=>{
+   app.put('/inventoryUpdate/:Id',async(req,res)=>{
     const Id = req.params.Id;
     const updateUser= req.body.quantity;
     const updateSold= req.body.sold;
@@ -83,14 +83,14 @@ async function run() {
   ///restock quantity
    app.put('/restock/:Id',async(req,res)=>{
     const Id = req.params.Id;
-    const updateUser= req.body.quantitys;
-    const getQuantity= req.body.getQuantity;
-    const sumQuantity = 
+    const updateUser= parseInt(req.body.quantity);
+    const getQuantity= parseInt(req.body.getQuantity);
+    const sumQuantity = updateUser+getQuantity;
     const filter = {_id:ObjectId(Id)};
     const options = { upsert: true };
     const updateDoc = {
       $set: {
-       quantity:updateUser
+       quantity:sumQuantity
        
       },
     };
@@ -99,7 +99,7 @@ async function run() {
   })
 
  //post and add new inventory
- app.post("/inventory",async(req,res)=>{
+ app.post("/inventoryPost",async(req,res)=>{
   const inventory = req.body;
   const getInventory = await inventoryCollection.insertOne(inventory);
   res.send(getInventory)
@@ -124,7 +124,7 @@ app.get("/inventorys",verifyToken,async(req,res)=>{
 }
 })
    //delete
-   app.delete("/inventory/:Id",async(req,res)=>{
+   app.delete("/inventoryDelete/:Id",async(req,res)=>{
     const Id = req.params.Id
     const query = {_id:ObjectId(Id)};
     const result = await inventoryCollection.deleteOne(query);
